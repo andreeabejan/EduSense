@@ -1,42 +1,58 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const { Pool } = require('pg');
+const session = require('express-session');
 const path = require('path');
-const fs = require('fs');
+const UserModel = require('./src/database/user_model'); 
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const port = process.env.PORT;  
 
 const app = express();
 
-const pool = new Pool({
-    user: 'postgres',    
-    host: 'localhost',
-    database: 'EduSense',
-    password: 'student', 
-    port: 5432,  //port implicit pe care PostgreSQL acceptă conexiuni
-});
+app.use(session({
+    secret: 'ceva-cheie-secreta',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        secure: false,           
+        maxAge: 24 * 60 * 60 * 1000 // 1 zi
+    }
+}));
 
 app.use(express.urlencoded({ extended: false }));
-
 app.use(express.static('public')); 
 app.set('views', path.join(__dirname, 'public', 'views'));
 app.set('view engine', 'ejs');
 
+app.get('/start_page', (req, res) => {
+    res.render('start_page.ejs');
+});
 
 app.get('/login', (req, res) => {
-    res.render('login.ejs')
+    res.render('login.ejs');
+});
+
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Eroare la distrugerea sesiunii:', err);
+            return res.status(500).send('A apărut o eroare.');
+        }
+        res.redirect('/login'); 
+    });
 });
 
 app.get('/create_account', (req, res) => {
-    res.render('create_account.ejs')
+    res.render('create_account.ejs');
 });
 
-// app.get('/profile', (req, res) =>{
-//     res.render('profile.ejs',{nume : user_name})
-// })
+app.get('/profile', (req, res) => {
+    if (!req.session.user_name) {
+        return res.redirect('/start_page');
+    }
+    res.render('profile.ejs', { nume: req.session.user_name });
+});
 
-app.post('/login', async (req, res) => { //async pt try-catch
+app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -44,21 +60,18 @@ app.post('/login', async (req, res) => { //async pt try-catch
     }
 
     try {
+        const user = await UserModel.findUserByEmail(email);
 
-        const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-
-        if (result.rows.length === 0) {
+        if (!user) {
             return res.status(400).send('Email sau parolă greșite.');
         }
-
-        const user = result.rows[0];
 
         if (await bcrypt.compare(password, user.password)) {
-            res.send('Autentificare reușită!');
-        } else{
+            req.session.user_name = user.username;
+            res.redirect('/profile');
+        } else {
             return res.status(400).send('Email sau parolă greșite.');
         }
-
     } catch (err) {
         console.error('Eroare la verificarea utilizatorului:', err);
         res.status(500).send('A apărut o eroare.');
@@ -73,25 +86,18 @@ app.post('/create_account', async (req, res) => {
     }
 
     try {
-        const checkUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (checkUser.rows.length > 0) {
+        if (await UserModel.checkEmailExists(email)) { 
             return res.status(400).send('Contul cu acest email există deja.');
         }
 
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
-        await pool.query('INSERT INTO users (email, username, password) VALUES ($1, $2, $3)', [email, username, hashedPassword]);
-        
+        await UserModel.createUser(email, username, password); 
         res.redirect('/login');
-
     } catch (err) {
         console.error('Eroare la salvarea în baza de date:', err);
         res.status(500).send('A apărut o eroare.');
     }
 });
 
-
 app.listen(port, () => {
     console.log(`User-service listening to port ${port}`);
 });
-
