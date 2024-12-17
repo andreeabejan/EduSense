@@ -1,4 +1,6 @@
 const express = require('express');
+require('dotenv').config();
+const port = process.env.PORT;  
 
 const app = express();
 
@@ -10,6 +12,6 @@ app.use('/', (req, res, next) => {
 
 })
 
-app.listen(8001, () => {
-    console.log('Courses-Service listening to port 8001')
+app.listen(port, () => {
+    console.log(`Courses-Service listening to port ${port}`)
 })
