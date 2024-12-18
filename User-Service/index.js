@@ -5,6 +5,8 @@ const UserModel = require('./src/database/user_model');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const port = process.env.PORT;  
+const port_courses = process.env.PORT_COURSES;
+
 
 const app = express();
 
@@ -43,6 +45,10 @@ app.get('/logout', (req, res) => {
 
 app.get('/create_account', (req, res) => {
     res.render('create_account.ejs');
+});
+
+app.get('/to_main_menu', (req, res) => {
+    res.redirect(`http://localhost:${port_courses}/main_menu`);
 });
 
 app.get('/profile', (req, res) => {
