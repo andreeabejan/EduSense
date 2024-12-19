@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capitals Exam</title>
+    <link rel="stylesheet" href="/css/capitals_exam.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div id="chat-box" class="chat-box">
+            <!-- aici vor veni mesajele -->
+        </div>
+        <div id="question-container" class="question">
+            <!-- aici vor fi intrebarile si input ul -->
+        </div>
+        <div id="hint" style="display: none;"></div>
+        <input type="text" id="answer-input" placeholder="Type your answer" style="width: 80%; padding: 10px; font-size: 16px;">
+        <button id="submit-btn" class="submit-btn">Submit</button>
+        <div id="score" style="margin-top: 20px; text-align: center;">
+            Score: <span id="score-value">0</span>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let incorrectAttempts = 0;
+
+        
+        //intrebari exemplu, inainte sa fac conexiunea cu worldcities.xlsx
+        const questions = [
+            { 
+                question: 'What is the capital of France?', 
+                answer: 'Paris'
+            },
+            { 
+                question: 'What is the capital of Germany?', 
+                answer: 'Berlin'
+            },
+            { 
+                question: 'What is the capital of Spain?', 
+                answer: 'Madrid'
+            }
+        ];
+
+
+        function showQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            const questionContainer = document.getElementById('question-container');
+            const chatBox = document.getElementById('chat-box');
+            const hintContainer = document.getElementById('hint');
+
+            const systemMessage = document.createElement('div');
+            systemMessage.classList.add('bubble', 'question-bubble');
+            systemMessage.textContent = currentQuestion.question;
+            chatBox.appendChild(systemMessage);
+
+            document.getElementById('answer-input').value = '';
+            hintContainer.style.display = 'none'; 
+            incorrectAttempts = 0;
+
+            document.getElementById('submit-btn').style.display = 'inline-block';
+        }
+
+
+        function handleAnswer() {
+            const currentQuestion = questions[currentQuestionIndex];
+            const userAnswer = document.getElementById('answer-input').value.trim();
+
+            const chatBox = document.getElementById('chat-box');
+            const hintContainer = document.getElementById('hint');
+
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('bubble', 'answer-bubble');
+            userMessage.textContent = userAnswer;
+            chatBox.appendChild(userMessage);
+
+            if (userAnswer.toLowerCase() === currentQuestion.answer.toLowerCase()) {
+                score++;
+                document.getElementById('score-value').textContent = score;
+
+                const correctMessage = document.createElement('div');
+                correctMessage.classList.add('bubble', 'question-bubble');
+                correctMessage.textContent = `✔️ Correct! The capital is ${currentQuestion.answer}.`;
+                chatBox.appendChild(correctMessage);
+
+                loadNextQuestion();
+            } else {
+                incorrectAttempts++;
+
+                if (incorrectAttempts == 2) {
+                    const hint = currentQuestion.answer.charAt(0) + " _ ".repeat(currentQuestion.answer.length - 2) + currentQuestion.answer.charAt(currentQuestion.answer.length - 1);
+                    hintContainer.style.display = 'block';
+                    hintContainer.textContent = `Hint: ${hint}`;
+
+                    document.getElementById('submit-btn').textContent = 'Submit';
+                } else if (incorrectAttempts >2) {
+                    loadNextQuestion();
+                    incorrectAttempts = 0;
+                } else{
+                    const incorrectMessage = document.createElement('div');
+                    incorrectMessage.classList.add('bubble', 'question-bubble');
+                    incorrectMessage.textContent = `❌ Incorrect. Try again.`;
+                    chatBox.appendChild(incorrectMessage);
+                }
+            }
+        }
+
+
+
+        function loadNextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            } else {
+                const chatBox = document.getElementById('chat-box');
+
+                const systemMessage = document.createElement('div');
+                systemMessage.classList.add('bubble', 'question-bubble');
+                systemMessage.textContent = `Quiz completed! Your final score is ${score} out of ${questions.length}.`;
+                chatBox.appendChild(systemMessage);
+
+                document.getElementById('submit-btn').style.display = 'none';
+            }
+        }
+
+
+        showQuestion();
+
+        document.getElementById('submit-btn').onclick = handleAnswer;
+    </script>
+</body>
+</html>

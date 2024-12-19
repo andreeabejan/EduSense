@@ -1,0 +1,76 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+.chat-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.chat-box {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    height: 300px;
+    overflow-y: auto;
+}
+.bubble {
+    padding: 10px;
+    border-radius: 20px;
+    max-width: 80%;
+    margin: 5px 0;
+    word-wrap: break-word;
+}
+.question-bubble {
+    background-color: #28a745;
+    color: white;
+    text-align: left;
+    float: left;
+    clear: both;
+}
+.answer-bubble {
+    background-color: #007bff;
+    color: white;
+    text-align: right;
+    float: right;
+    clear: both;
+}
+.question {
+    margin: 20px 0;
+}
+.submit-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+#hint {
+    font-style: italic;
+    color: #FF6347;
+    margin: 10px 0;
+}
+#score {
+    display: inline-block;
+    font-size: 16px;
+    padding-left: 10px;
+}
+.score {
+    display: inline-block;
+    font-size: 16px;
+    padding-left: 10px;
+}

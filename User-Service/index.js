@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 require('dotenv').config();
 const port = process.env.PORT;  
 const port_courses = process.env.PORT_COURSES;
+const port_gateway = process.env.PORT_GATEWAY;
 
 
 const app = express();
@@ -24,10 +25,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public')); 
 app.set('views', path.join(__dirname, 'public', 'views'));
 app.set('view engine', 'ejs');
-
-app.get('/start_page', (req, res) => {
-    res.render('start_page.ejs');
-});
 
 app.get('/login', (req, res) => {
     res.render('login.ejs');
@@ -48,7 +45,7 @@ app.get('/create_account', (req, res) => {
 });
 
 app.get('/to_main_menu', (req, res) => {
-    res.redirect(`http://localhost:${port_courses}/main_menu`);
+    res.redirect(`http://localhost:${port_gateway}/courses/main_menu`);
 });
 
 app.get('/profile', (req, res) => {
@@ -102,6 +99,10 @@ app.post('/create_account', async (req, res) => {
         console.error('Eroare la salvarea în baza de date:', err);
         res.status(500).send('A apărut o eroare.');
     }
+});
+
+app.get('/', (req, res) => {
+    res.render('start_page.ejs');
 });
 
 app.listen(port, () => {
