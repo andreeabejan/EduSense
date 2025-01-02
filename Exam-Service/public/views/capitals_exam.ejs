@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/exam/css/capitals_exam.css">
 </head>
 <body>
+    <div id="chat-containter-everything">
     <div class="chat-container">
         <div id="chat-box" class="chat-box">
             <!-- aici vor veni mesajele -->
@@ -20,6 +21,7 @@
         <div id="score" style="margin-top: 20px; text-align: center;">
             Score: <span id="score-value">0</span>
         </div>
+    </div>
     </div>
 
     <script>
@@ -122,7 +124,26 @@
                 chatBox.appendChild(systemMessage);
 
                 document.getElementById('submit-btn').style.display = 'none';
-            }
+                
+                //timer and redirect
+                const countdownContainer = document.createElement('div');
+                countdownContainer.id = 'countdown-timer';
+                countdownContainer.classList.add('countdown-timer');
+                document.body.appendChild(countdownContainer);
+
+                let countdown = 4; 
+                countdownContainer.textContent = `Redirecting in ${countdown}...`;
+
+                const interval = setInterval(() => {
+                    countdown--;
+                    countdownContainer.textContent = `Redirecting in ${countdown}...`;
+
+                    if (countdown <= 0) {
+                        clearInterval(interval);
+                        window.location.href = '/exam/feedback'; 
+                    }
+                }, 1000); // update every second
+                    }
         }
 
 

@@ -33,11 +33,6 @@ const generateFlagUrl = (countryName) => {
     return `https://flagcdn.com/w320/${isoCode.toLowerCase()}.png`;
 };
 
-// app.get('/to_capitals_exam', (req, res) => {
-//     res.redirect(`http://localhost:${port_gateway}/exam/capitals-exam`);
-// });
-
-
 app.get('/capitals', (req, res) => {
     const workbook = XLSX.readFile(filePath);
     const sheetName = workbook.SheetNames[0];

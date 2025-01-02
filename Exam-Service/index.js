@@ -2,6 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const path = require('path');
 const analyzeSentiment = require('./analyse_sentiment.js');
+const processFeedback = require('./controllers/process-feedback');
 const port = process.env.PORT;  
 
 const app = express();
@@ -18,16 +19,25 @@ app.get('/capitals-exam', (req, res) => {
     res.render('capitals_exam');
 });
 
-// app.post('/analyze', (req, res) => {
-//     const text = req.body.text;
-//     if (!text) {
-//         return res.status(400).send({ error: 'Text is required for sentiment analysis' });
-//     }
+app.get('/feedback', (req,res) => {
+    res.render('feedback');
+})
 
-//     const sentiment = analyzeSentiment(text);
-//     console.log(sentimet);
-//     res.json({ response : sentiment});
-// });
+
+app.post('/process-feedback', (req, res) => {
+    const userFeedback = req.body.feedback; 
+
+    if (userFeedback) {
+        const result = processFeedback(userFeedback);
+
+        res.json(result);
+    } else {
+        res.json({
+            success: false,
+            error: "Nu ai furnizat niciun feedback."
+        });
+    }
+});
 
 
 app.use('/', (req, res, next) => {
