@@ -13,7 +13,7 @@
             <!-- aici vor veni mesajele -->
         </div>
         <div id="question-container" class="question">
-            <!-- aici vor fi intrebarile si input ul -->
+            <!-- aici vor fi intrebarile si input-ul -->
         </div>
         <div id="hint" style="display: none;"></div>
         <input type="text" id="answer-input" placeholder="Type your answer" style="width: 80%; padding: 10px; font-size: 16px;">
@@ -28,26 +28,37 @@
         let currentQuestionIndex = 0;
         let score = 0;
         let incorrectAttempts = 0;
+        let questions = [];
 
-        
-        //intrebari exemplu, inainte sa fac conexiunea cu worldcities.xlsx
-        const questions = [
-            { 
-                question: 'What is the capital of France?', 
-                answer: 'Paris'
-            },
-            { 
-                question: 'What is the capital of Germany?', 
-                answer: 'Berlin'
-            },
-            { 
-                question: 'What is the capital of Spain?', 
-                answer: 'Madrid'
+        async function loadQuestions() {
+            try {
+            const response = await fetch('/exam/questions');
+            if (response.ok) {
+                questions = await response.json();
+                showQuestion(); 
+            } else {
+                const chatBox = document.getElementById('chat-box');
+                const systemMessage = document.createElement('div');
+                systemMessage.classList.add('bubble', 'question-bubble');
+                systemMessage.textContent = 'Eroare la încărcarea întrebărilor. Te rugăm să încerci din nou.';
+                chatBox.appendChild(systemMessage);
             }
-        ];
-
+        } catch (error) {
+        console.error('Error while fetching questions:', error);
+        res.status(500).send('Internal Server Error');
+        }
+        }
 
         function showQuestion() {
+            if (questions.length === 0) {
+                const chatBox = document.getElementById('chat-box');
+                const systemMessage = document.createElement('div');
+                systemMessage.classList.add('bubble', 'question-bubble');
+                systemMessage.textContent = 'Nu s-au găsit întrebări valabile. Te rugăm să încarci un fișier valid.';
+                chatBox.appendChild(systemMessage);
+                return;
+            }
+
             const currentQuestion = questions[currentQuestionIndex];
             const questionContainer = document.getElementById('question-container');
             const chatBox = document.getElementById('chat-box');
@@ -64,7 +75,6 @@
 
             document.getElementById('submit-btn').style.display = 'inline-block';
         }
-
 
         function handleAnswer() {
             const currentQuestion = questions[currentQuestionIndex];
@@ -97,10 +107,10 @@
                     hintContainer.textContent = `Hint: ${hint}`;
 
                     document.getElementById('submit-btn').textContent = 'Submit';
-                } else if (incorrectAttempts >2) {
+                } else if (incorrectAttempts > 2) {
                     loadNextQuestion();
                     incorrectAttempts = 0;
-                } else{
+                } else {
                     const incorrectMessage = document.createElement('div');
                     incorrectMessage.classList.add('bubble', 'question-bubble');
                     incorrectMessage.textContent = `❌ Incorrect. Try again.`;
@@ -108,8 +118,6 @@
                 }
             }
         }
-
-
 
         function loadNextQuestion() {
             if (currentQuestionIndex < questions.length - 1) {
@@ -125,7 +133,7 @@
 
                 document.getElementById('submit-btn').style.display = 'none';
                 
-                //timer and redirect
+                // timer and redirect
                 const countdownContainer = document.createElement('div');
                 countdownContainer.id = 'countdown-timer';
                 countdownContainer.classList.add('countdown-timer');
@@ -143,13 +151,12 @@
                         window.location.href = '/exam/feedback'; 
                     }
                 }, 1000); // update every second
-                    }
+            }
         }
 
-
-        showQuestion();
+        loadQuestions();
 
         document.getElementById('submit-btn').onclick = handleAnswer;
     </script>
 </body>
-</html> 
+</html>

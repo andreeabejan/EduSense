@@ -38,11 +38,11 @@ app.get('/capitals', (req, res) => {
     const sheetName = workbook.SheetNames[0];
     const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-    const excludedCountries = ['Korea, South', 'Congo (Kinshasa)', 'Burma', 'Côte d’Ivoire', 'Korea, North', 'Syria', 'Congo (Brazzaville)', 
-        'Burma', 'Laos', 'Moldova', 'Gaza Strip',' Gambia, The', 'Bahamas, The', 'Praia', 'Brunei', 'Côte d’Ivoire', 'Saint Martin', 'Saint Barthelemy',
-        'Falkland Islands (Islas Malvinas)','Sint Maarten', 'Svalbard', 'Cabo Verde', 'Vatican City', 'Saint Helena, Ascension, and Tristan da Cunha',
-         'South Georgia And South Sandwich Islands', 'U.S. Virgin Islands', 'Gambia, The'];  // tari pentru care nu a gasit steag
-
+    // const excludedCountries = ['Korea, South', 'Congo (Kinshasa)', 'Burma', 'Côte d’Ivoire', 'Korea, North', 'Syria', 'Congo (Brazzaville)', 
+    //     'Burma', 'Laos', 'Moldova', 'Gaza Strip',' Gambia, The', 'Bahamas, The', 'Praia', 'Brunei', 'Côte d’Ivoire', 'Saint Martin', 'Saint Barthelemy',
+    //     'Falkland Islands (Islas Malvinas)','Sint Maarten', 'Svalbard', 'Cabo Verde', 'Vatican City', 'Saint Helena, Ascension, and Tristan da Cunha',
+    //      'South Georgia And South Sandwich Islands', 'U.S. Virgin Islands', 'Gambia, The'];  // tari pentru care nu a gasit steag
+    const excludedCountries = [];
     const capitals = data
         .filter(row => row.capital === 'primary' && !excludedCountries.includes(row.country))
         .map(row => ({

@@ -3,6 +3,7 @@ require('dotenv').config();
 const path = require('path');
 const analyzeSentiment = require('./analyse_sentiment.js');
 const processFeedback = require('./controllers/process-feedback');
+const XLSX = require('xlsx');
 const port = process.env.PORT;  
 
 const app = express();
@@ -22,6 +23,42 @@ app.get('/capitals-exam', (req, res) => {
 app.get('/feedback', (req,res) => {
     res.render('feedback');
 })
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; 
+    }
+    return array;
+}
+
+app.get('/questions', (req, res) => {
+    const filePath = path.join(__dirname, 'src', 'database', 'worldcities.xlsx');
+    
+    const workbook = XLSX.readFile(filePath);
+    
+    const sheet = workbook.Sheets[workbook.SheetNames[0]]; 
+    
+    const citiesData = XLSX.utils.sheet_to_json(sheet);
+    
+    //here will set the population accordingly to the user's set level of the course in the database
+    const minPopulation = 5000011; //5000000 max
+    const filteredCities = citiesData.filter(city => city.population > minPopulation);
+    
+    const questions = [];
+    
+    filteredCities.forEach(city => {
+        if (city.capital && city.capital.toLowerCase() === "primary") {
+            questions.push({
+                question: `What is the capital of ${city.country}?`,  
+                answer: city.city  
+            });
+        }
+    });
+    const randomQuestions = shuffleArray(questions).slice(0, 10);
+
+    res.json(randomQuestions);
+});
 
 
 app.post('/process-feedback', (req, res) => {
