@@ -36,7 +36,8 @@ app.get('/logout', (req, res) => {
             console.error('Eroare la distrugerea sesiunii:', err);
             return res.status(500).send('A apărut o eroare.');
         }
-        res.redirect('/login'); 
+        // res.redirect('/login'); 
+        res.render('start_page.ejs');
     });
 });
 
@@ -71,6 +72,7 @@ app.post('/login', async (req, res) => {
 
         if (await bcrypt.compare(password, user.password)) {
             req.session.user_name = user.username;
+            req.session.email = user.email; //check if right later 
             res.redirect('/profile');
         } else {
             return res.status(400).send('Email sau parolă greșite.');
