@@ -76,6 +76,10 @@
             document.getElementById('submit-btn').style.display = 'inline-block';
         }
 
+        function normalize(str) {
+            return str.normalize("NFD").replace(/[̀-ͯ]/g, "");
+        }
+
         function handleAnswer() {
             const currentQuestion = questions[currentQuestionIndex];
             const userAnswer = document.getElementById('answer-input').value.trim();
@@ -88,7 +92,7 @@
             userMessage.textContent = userAnswer;
             chatBox.appendChild(userMessage);
 
-            if (userAnswer.toLowerCase() === currentQuestion.answer.toLowerCase()) {
+            if (normalize(userAnswer.toLowerCase()) === normalize(currentQuestion.answer.toLowerCase())) {
                 score++;
                 document.getElementById('score-value').textContent = score;
 

@@ -21,16 +21,38 @@ const UserModel = {
         return result.rows.length > 0;
     },
 
-    async getCourseLevel(req) {
+    async getCourseLevel(req, course) {
         if (!req.session.email) {
             throw new Error('User not logged in');
         }
-
+    
         const email = req.session.email;
-        const result = await pool.query('SELECT capitals_course FROM users WHERE email = $1', [email]);
+        const result = await pool.query(
+            `SELECT ${course}_course FROM users WHERE email = $1`,
+            [email]
+        );
         
         if (result.rows.length > 0) {
-            return result.rows[0].capitals_course;  
+            return result.rows[0][`${course}_course`];  
+        } else {
+            throw new Error('User not found');
+        }
+    }
+
+    async growCourseLevel(req, course) {
+        if (!req.session.email) {
+            throw new Error('User not logged in');
+        }
+    
+        const email = req.session.email;
+        
+        const result = await pool.query(
+            `UPDATE users SET ${course}_course = ${course}_course + 1 WHERE email = $1 RETURNING ${course}_course`,
+            [email]
+        );
+    
+        if (result.rows.length > 0) {
+            return result.rows[0][`${course}_course`]; 
         } else {
             throw new Error('User not found');
         }
