@@ -12,6 +12,22 @@ body {
     gap: 20px;
     justify-content: center;
 }
+
+.progress-container {
+    width: 100%;
+    height: 20px;
+    background-color: #ddd; 
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4caf50; 
+    border-radius: 10px;
+     width: 0%; /* doar initial */
+}
+
 .card {
     border: 1px solid #ccc;
     border-radius: 8px;

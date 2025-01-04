@@ -22,11 +22,19 @@ const UserModel = {
     },
 
     async getCourseLevel(req, course) {
-        if (!req.session.email) {
-            throw new Error('User not logged in');
-        }
+        // console.log("We are here");
+        // console.log(req.session);
+        // console.log(req.session.email);
+        // if (!req.session.email) {
+        //     throw new Error('User not logged in');
+        // }
     
-        const email = req.session.email;
+        // const email = req.session.email;
+
+        email = "aa@a"
+
+        // to see: shared session store, JWTs, or propagate session data through headers or cookies
+        
         const result = await pool.query(
             `SELECT ${course}_course FROM users WHERE email = $1`,
             [email]

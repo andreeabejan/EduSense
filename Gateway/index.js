@@ -8,21 +8,16 @@ const port_courses_service = process.env.PORT_COURSES;
 const port_exam_service = process.env.PORT_EXAM;
 app.use(express.static('public'));
 
-app.use((req, res, next) => {
-    console.log(`Received request: ${req.method} ${req.url}`);
-    next();
-});
+// app.use((req, res, next) => {
+//     console.log(`Received request: ${req.method} ${req.url}`);
+//     next();
+// });
 
 app.use('/courses', createProxyMiddleware({ 
     target: `http://localhost:${port_courses_service}`, 
     changeOrigin: true,
     pathRewrite: {
         '^/courses': '', 
-    },
-    onProxyRes: (proxyRes, req, res) => { //incerc sa rezolv identificarea fisierelor css
-        if (req.url.includes('.css')) {
-            res.setHeader('Content-Type', 'text/css');
-        }
     },
 }));
 

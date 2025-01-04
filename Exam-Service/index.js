@@ -4,6 +4,7 @@ const path = require('path');
 const analyzeSentiment = require('./analyse_sentiment.js');
 const processFeedback = require('./controllers/process-feedback');
 const XLSX = require('xlsx');
+const UserModel = require('./src/database/models/User');
 const port = process.env.PORT;  
 
 const app = express();

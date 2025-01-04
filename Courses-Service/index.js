@@ -4,6 +4,7 @@ const path = require('path');
 require('dotenv').config();
 const XLSX = require('xlsx');
 const port = process.env.PORT;  
+const UserModel = require('./src/database/models/User');
 const port_gateway = process.env.GATEWAY_PORT;
 
 const app = express();
@@ -54,6 +55,16 @@ app.get('/capitals', (req, res) => {
     res.render('capitals_course', { capitals, port_gateway });
 });
 
+app.get('/user-level', async (req, res) => {
+    try {
+        const course = 'capitals'; 
+        const level = await UserModel.getCourseLevel(req, course);
+        res.json({ level });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+});
 
 
 app.listen(port, () => {
