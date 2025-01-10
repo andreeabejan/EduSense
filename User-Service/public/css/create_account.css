@@ -1,0 +1,51 @@
+.all-container{
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+}
+
+.create-account-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.input-set{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
+.create-account-button{
+    font-size: 130%;
+    background-color: #f9f9f9;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.create-account-button:hover{
+    background-color: #c2c2c2;
+}
+
+.subtext{
+    font-size: 200%;
+}
+
+.title{
+    font-size: 400%;
+}
+
+body{
+    background-color: #f4f4f4;
+}
+
+.input-box{
+    width: 100%;
+    height: 20px;
+    margin-left: 10px;
+}
+
+.login{
+    display: flex;
+    font-size: 150%;
+}

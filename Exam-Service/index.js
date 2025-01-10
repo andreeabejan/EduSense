@@ -56,7 +56,7 @@ app.get('/questions', (req, res) => {
             });
         }
     });
-    const randomQuestions = shuffleArray(questions).slice(0, 10);
+    const randomQuestions = shuffleArray(questions).slice(0, 3);
 
     res.json(randomQuestions);
 });

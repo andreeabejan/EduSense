@@ -7,6 +7,8 @@ require('dotenv').config();
 const port = process.env.PORT;  
 const port_courses = process.env.PORT_COURSES;
 const port_gateway = process.env.PORT_GATEWAY;
+const accessToken = process.env.ACCESS_TOKEN_SECRET;
+const jwt = require('jsonwebtoken');
 
 
 const app = express();
@@ -20,6 +22,8 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000 // 1 zi
     }
 }));
+
+app.use(express.json());
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public')); 
@@ -53,8 +57,48 @@ app.get('/profile', (req, res) => {
     if (!req.session.user_name) {
         return res.redirect('/start_page');
     }
-    res.render('profile.ejs', { nume: req.session.user_name });
+    // res.render('profile.ejs', { nume: req.session.user_name });
+    res.render('profile.ejs');
 });
+
+// app.post('/login', async (req, res) => {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//         return res.status(400).send('Email și parola sunt obligatorii.');
+//     }
+
+//     try {
+//         const user = await UserModel.findUserByEmail(email);
+
+//         if (!user) {
+//             return res.status(400).send('Email sau parolă greșite.');
+//         }
+
+//         if (await bcrypt.compare(password, user.password)) {
+//             req.session.user_name = user.username;
+//             req.session.email = user.email; //check if right later 
+
+//           //  const username = user.username;
+//           //  const user1 = { name : username };
+//           //  const accessToken = jwt.sign(user1, process.env.ACCESS_TOKEN_SECRET)
+//             // dont forget expiration date after a way to refresh the token
+
+            
+//           //res.json({ accessToken: accessToken })
+
+//           res.redirect('/profile');
+
+            
+//         } else {
+//             return res.status(400).send('Email sau parolă greșite.');
+//         }
+//     } catch (err) {
+//         console.error('Eroare la verificarea utilizatorului:', err);
+//         res.status(500).send('A apărut o eroare.');
+//     }
+
+// });
 
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -73,7 +117,7 @@ app.post('/login', async (req, res) => {
         if (await bcrypt.compare(password, user.password)) {
             req.session.user_name = user.username;
             req.session.email = user.email; //check if right later 
-            res.redirect('/profile');
+            res.render('profile', { nume: req.session.user_name });
         } else {
             return res.status(400).send('Email sau parolă greșite.');
         }
@@ -82,6 +126,7 @@ app.post('/login', async (req, res) => {
         res.status(500).send('A apărut o eroare.');
     }
 });
+
 
 app.post('/create_account', async (req, res) => {
     const { email, username, password } = req.body;
