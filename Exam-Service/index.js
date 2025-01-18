@@ -5,6 +5,7 @@ const analyzeSentiment = require('./analyse_sentiment.js');
 const processFeedback = require('./controllers/process-feedback');
 const XLSX = require('xlsx');
 const UserModel = require('./src/database/models/User');
+const ExamModel = require('./src/database/models/Exam'); 
 const port = process.env.PORT;  
 
 const app = express();
@@ -76,6 +77,30 @@ app.post('/process-feedback', (req, res) => {
         });
     }
 });
+
+app.post('/insert-feedback', async (req, res) => {
+    try {
+        const { userId, compound, course } = req.body;
+
+        // userLevel = ExamModel.getUserCourseLevel("aa@a","capitals_course"); //info trebuie extrase din user curent
+
+        userLevel = 1;
+
+        console.log(userLevel);
+
+        if (!userLevel || !userId ||  !compound || !course) {
+            return res.status(400).json({ success: false, error: 'Invalid request body' });
+        }
+
+        await ExamModel.insertFeedback(`Capitals_record`, userId, compound, userLevel);
+
+        res.status(201).json({ success: true, message: 'Feedback inserted successfully' });
+    } catch (error) {
+        console.error('Error inserting feedback:', error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+
 
 
 app.use('/', (req, res, next) => {

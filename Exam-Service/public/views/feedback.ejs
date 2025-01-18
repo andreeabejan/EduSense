@@ -33,69 +33,77 @@
         }
 
         async function handleAnswer() {
-            const userAnswer = document.getElementById('answer-input').value.trim();
+        const userAnswer = document.getElementById('answer-input').value.trim();
 
-            if (!userAnswer) {
-                alert("Please provide some feedback.");
-                return;
-            }
-
-            const chatBox = document.getElementById('chat-box');
-            const userMessage = document.createElement('div');
-            userMessage.classList.add('bubble', 'answer-bubble');
-            userMessage.textContent = userAnswer;
-            chatBox.appendChild(userMessage);
-
-            try {
-                const response = await fetch('/exam/process-feedback', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ feedback: userAnswer })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to submit feedback');
-                }
-
-                const result = await response.json();
-
-                const responseMessage = document.createElement('div');
-                responseMessage.classList.add('bubble', 'response-bubble');
-                
-                if (result.success) {
-                    const sentimentMessage = result.compound 
-                        ? `Compound: ${result.compound}` 
-                        : 'No compound';
-
-                    responseMessage.textContent = `Thank you for your feedback: "${result.message}". ${sentimentMessage}`;
-                    chatBox.appendChild(responseMessage);
-
-                    document.getElementById('submit-btn').style.display = 'none';
-
-                    const backToMenuButton = document.createElement('button');
-                    backToMenuButton.classList.add('submit-btn');
-                    backToMenuButton.textContent = 'Back to the course page';
-
-                   
-                    backToMenuButton.onclick = function() {
-                        window.location.href = '/courses/capitals';  // Redirect to the main menu or homepage
-                    };
-
-                    document.getElementById('submit-btn').parentElement.appendChild(backToMenuButton);
-                } else {
-                    responseMessage.textContent = `Error: ${result.error}`;
-                }
-
-                chatBox.appendChild(responseMessage);
-            } catch (error) {
-                const errorMessage = document.createElement('div');
-                errorMessage.classList.add('bubble', 'response-bubble');
-                errorMessage.textContent = `There was an error submitting your feedback. Please try again later. Error details: ${error.message}`;
-                chatBox.appendChild(errorMessage);
-            }
+        if (!userAnswer) {
+            alert("Please provide some feedback.");
+            return;
         }
+
+        const chatBox = document.getElementById('chat-box');
+        const userMessage = document.createElement('div');
+        userMessage.classList.add('bubble', 'answer-bubble');
+        userMessage.textContent = userAnswer;
+        chatBox.appendChild(userMessage);
+
+        try {
+            const response = await fetch('/exam/process-feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ feedback: userAnswer })
+            });
+
+            if (!response.ok) throw new Error('Failed to submit feedback for processing.');
+
+            const result = await response.json();
+            const sentimentScore = result.compound;
+            const feedbackMessage = result.message || 'Processed successfully.';
+
+            const sentimentMessage = document.createElement('div');
+            sentimentMessage.classList.add('bubble', 'response-bubble');
+            sentimentMessage.textContent = `Feedback processed: ${feedbackMessage}. Sentiment score: ${sentimentScore}`;
+            chatBox.appendChild(sentimentMessage);
+
+            const insertResponse = await fetch('/exam/insert-feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: 1, // de extras din current user
+                    compound: sentimentScore,
+                    course: 'capitals'
+                })
+            });
+
+            if (!insertResponse.ok) throw new Error('Failed to insert feedback.');
+
+            const insertResult = await insertResponse.json();
+            if (insertResult.success) {
+                const successMessage = document.createElement('div');
+                successMessage.classList.add('bubble', 'response-bubble');
+                successMessage.textContent = 'Feedback inserted successfully. Thank you!';
+                chatBox.appendChild(successMessage);
+            } else {
+                throw new Error(insertResult.error || 'Unknown error during feedback insertion.');
+            }
+
+            document.getElementById('submit-btn').style.display = 'none';
+
+            const backToMenuButton = document.createElement('button');
+            backToMenuButton.classList.add('submit-btn');
+            backToMenuButton.textContent = 'Back to the course page';
+
+            backToMenuButton.onclick = function() {
+                window.location.href = '/courses/capitals';
+            };
+
+            document.getElementById('submit-btn').parentElement.appendChild(backToMenuButton);
+        } catch (error) {
+            const errorMessage = document.createElement('div');
+            errorMessage.classList.add('bubble', 'response-bubble');
+            errorMessage.textContent = `There was an error submitting your feedback. Error: ${error.message}`;
+            chatBox.appendChild(errorMessage);
+        }
+    }
 
         showQuestion();
         document.getElementById('submit-btn').onclick = handleAnswer;
